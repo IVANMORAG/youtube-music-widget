@@ -1,34 +1,79 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
+const { createElement } = require('react');
+const { renderToString } = require('react-dom/server');
+const fetch = require('node-fetch');
 
-export default async (req, res) => {
-  const { createServer } = require('vite');
-  const react = require('@vitejs/plugin-react');
-  const { renderToString } = require('react-dom/server');
-  const React = require('react');
-  const App = require('../../src/App').default;
+const YOUTUBE_API_KEY = 'AIzaSyAARR7nrde1tPrL4BOQlhb8S26XUiMCx_I';
+const PLAYLIST_ID = 'PLlHhWhyPeWs7qJtNiUH3f8Z3oSO8CgiH-';
 
-  const server = await createServer({
-    server: { middlewareMode: true },
-    appType: 'custom',
-    plugins: [react()]
-  });
-
-  const app = React.createElement(App);
-  const html = await renderToString(app);
-
-  res.setHeader('Content-Type', 'image/svg+xml');
-  res.status(200).send(`
-    <svg xmlns="http://www.w3.org/2000/svg" width="340" height="240" viewBox="0 0 340 240">
-      <foreignObject width="340" height="240">
-        <div xmlns="http://www.w3.org/1999/xhtml">
-          <style>
-            body { margin: 0; }
-            ${require('fs').readFileSync('./src/App.css', 'utf8')}
-          </style>
-          ${html}
-        </div>
-      </foreignObject>
-    </svg>
-  `);
+const App = () => {
+  // Este es un componente simplificado para SSR
+  return createElement('div', null, 'Cargando...');
 };
+
+module.exports = async (req, res) => {
+  try {
+    // 1. Obtener datos de la playlist
+    const playlistResponse = await fetch(
+      `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=1&playlistId=${PLAYLIST_ID}&key=${YOUTUBE_API_KEY}`
+    );
+    
+    if (!playlistResponse.ok) {
+      throw new Error('Error al obtener la playlist');
+    }
+
+    const data = await playlistResponse.json();
+    const track = data.items[0].snippet;
+    const thumbnail = track.thumbnails?.high?.url || track.thumbnails?.default?.url;
+    const title = track.title.split(' - ')[0];
+    const artist = track.title.split(' - ')[1] || track.videoOwnerChannelTitle;
+
+    // 2. Generar SVG
+    const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="340" height="180" viewBox="0 0 340 180">
+      <style>
+        .widget { font-family: Arial, sans-serif; }
+        .title { font-size: 16px; font-weight: bold; }
+        .artist { font-size: 14px; fill: #aaa; }
+        .logo { font-size: 12px; fill: #aaa; font-weight: bold; }
+      </style>
+      <rect width="340" height="180" rx="10" fill="#212121"/>
+      
+      <!-- Imagen del álbum -->
+      <image href="${thumbnail}" x="20" y="20" width="120" height="120" rx="5"/>
+      
+      <!-- Información de la canción -->
+      <text x="150" y="50" class="title">${title}</text>
+      <text x="150" y="70" class="artist">${artist}</text>
+      
+      <!-- Barras de sonido -->
+      <rect x="150" y="90" width="4" height="30" fill="#FF0000" rx="2">
+        <animate attributeName="height" values="30;10;30" dur="1s" repeatCount="indefinite" begin="0.1s"/>
+      </rect>
+      <rect x="160" y="90" width="4" height="30" fill="#FF0000" rx="2">
+        <animate attributeName="height" values="30;15;30" dur="1s" repeatCount="indefinite" begin="0.3s"/>
+      </rect>
+      <rect x="170" y="90" width="4" height="30" fill="#FF0000" rx="2">
+        <animate attributeName="height" values="30;20;30" dur="1s" repeatCount="indefinite" begin="0.5s"/>
+      </rect>
+      
+      <!-- Logo -->
+      <text x="20" y="160" class="logo">YouTube Music</text>
+    </svg>
+    `;
+
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
+    res.status(200).send(svg);
+
+  } catch (error) {
+    console.error('Error:', error);
+    // SVG de fallback
+    const errorSvg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="340" height="180">
+      <rect width="340" height="180" fill="#212121"/>
+      <text x="50%" y="50%" fill="white" text-anchor="middle">Error loading playlist</text>
+    </svg>
+    `;
+    res.status(500).send(errorSvg);
+  }
+};  
