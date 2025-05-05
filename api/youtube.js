@@ -9,8 +9,9 @@ module.exports = async (req, res) => {
       throw new Error('YOUTUBE_API_KEY no configurada');
     }
 
+    // Obtener hasta 50 canciones de la playlist
     const playlistResponse = await fetch(
-      `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=1&playlistId=${PLAYLIST_ID}&key=${YOUTUBE_API_KEY}`
+      `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${PLAYLIST_ID}&key=${YOUTUBE_API_KEY}`
     );
 
     if (!playlistResponse.ok) {
@@ -22,15 +23,18 @@ module.exports = async (req, res) => {
       throw new Error('No se encontraron elementos en la playlist');
     }
 
-    const track = data.items[0].snippet;
+    // Seleccionar una canción aleatoria
+    const randomIndex = Math.floor(Math.random() * data.items.length);
+    const track = data.items[randomIndex].snippet;
+
     // Debug: Log thumbnail URLs
     console.log('Thumbnail High:', track.thumbnails?.high?.url);
     console.log('Thumbnail Default:', track.thumbnails?.default?.url);
 
     // Seleccionar thumbnail con fallback
-    const thumbnail = track.thumbnails?.high?.url || track.thumbnails?.default?.url || 'https://via.placeholder.com/120';
-    // Sanitizar thumbnail URL (por si acaso)
-    const safeThumbnail = encodeURI(thumbnail);
+    const thumbnailRaw = track.thumbnails?.high?.url || track.thumbnails?.default?.url || 'https://via.placeholder.com/120';
+    // Sanitizar thumbnail URL
+    const safeThumbnail = encodeURI(thumbnailRaw);
 
     const title = (track.title.split(' - ')[0] || 'Título Desconocido').replace(/[<>&"']/g, '');
     const artist = (track.title.split(' - ')[1] || track.videoOwnerChannelTitle || 'Artista Desconocido').replace(/[<>&"']/g, '');
