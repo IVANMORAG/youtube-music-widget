@@ -27,14 +27,9 @@ module.exports = async (req, res) => {
     const randomIndex = Math.floor(Math.random() * data.items.length);
     const track = data.items[randomIndex].snippet;
 
-    // Debug: Log thumbnail URLs
-    console.log('Thumbnail High:', track.thumbnails?.high?.url);
-    console.log('Thumbnail Default:', track.thumbnails?.default?.url);
-
-    // Seleccionar thumbnail con fallback
+    // Usar proxy para las miniaturas (compatible con GitHub)
     const thumbnailRaw = track.thumbnails?.high?.url || track.thumbnails?.default?.url || 'https://via.placeholder.com/120';
-    // Sanitizar thumbnail URL
-    const safeThumbnail = encodeURI(thumbnailRaw);
+    const safeThumbnail = `https://images.weserv.nl/?url=${encodeURIComponent(thumbnailRaw.replace('https://', ''))}&w=120&h=120`;
 
     const title = (track.title.split(' - ')[0] || 'Título Desconocido').replace(/[<>&"']/g, '');
     const artist = (track.title.split(' - ')[1] || track.videoOwnerChannelTitle || 'Artista Desconocido').replace(/[<>&"']/g, '');
@@ -65,14 +60,14 @@ module.exports = async (req, res) => {
     `;
 
     res.setHeader('Content-Type', 'image/svg+xml');
-    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.status(200).send(svg);
   } catch (error) {
     console.error('Error:', error.message);
     const errorSvg = `
       <svg xmlns="http://www.w3.org/2000/svg" width="340" height="180">
         <rect width="340" height="180" fill="#212121"/>
-        <text x="50%" y="50%" fill="white" text-anchor="middle">Error: ${error.message}</text>
+        <text x="50%" y="50%" fill="white" text-anchor="middle">Error: ${error.message.replace(/[<>&]/g, '')}</text>
       </svg>
     `;
     res.setHeader('Content-Type', 'image/svg+xml');
