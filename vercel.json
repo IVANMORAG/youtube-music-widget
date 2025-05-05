@@ -2,18 +2,21 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/youtube.js",
+      "src": "api/now-playing.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api/youtube",
-      "dest": "/api/youtube.js"
+      "src": "/now-playing",
+      "dest": "/api/now-playing"
     },
     {
-      "src": "/(.*)",
-      "dest": "/api/youtube.js"
+      "src": "/",
+      "dest": "/api/now-playing",
+      "headers": {
+        "Cache-Control": "s-maxage=60, stale-while-revalidate"
+      }
     }
   ]
 }

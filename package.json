@@ -8,6 +8,6 @@
     "dev": "vercel dev"
   },
   "dependencies": {
-    "node-fetch": "^2.6. prawn12"
+    "node-fetch": "^2.6.7"
   }
 }
