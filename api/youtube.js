@@ -39,6 +39,18 @@ module.exports = async (req, res) => {
         <image href="https://img.youtube.com/vi/${videoId}/mqdefault.jpg" x="20" y="20" width="120" height="120"/>
         <text x="150" y="50" class="title">${title}</text>
         <text x="150" y="70" class="artist">${artist}</text>
+        
+        <!-- ¡Barritas animadas recuperadas! -->
+        <rect x="150" y="90" width="4" height="30" fill="#FF0000" rx="2">
+          <animate attributeName="height" values="30;10;30" dur="1s" repeatCount="indefinite" begin="0.1s"/>
+        </rect>
+        <rect x="160" y="90" width="4" height="30" fill="#FF0000" rx="2">
+          <animate attributeName="height" values="30;15;30" dur="1s" repeatCount="indefinite" begin="0.3s"/>
+        </rect>
+        <rect x="170" y="90" width="4" height="30" fill="#FF0000" rx="2">
+          <animate attributeName="height" values="30;20;30" dur="1s" repeatCount="indefinite" begin="0.5s"/>
+        </rect>
+        
         <text x="20" y="160" font-family="Arial" font-size="12" fill="#aaa">YouTube Music</text>
       </svg>
     `;
