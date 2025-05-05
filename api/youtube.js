@@ -29,42 +29,51 @@ module.exports = async (req, res) => {
     const artist = (track.title.split(' - ')[1] || track.videoOwnerChannelTitle || 'Artista Desconocido').replace(/[<>&"']/g, '');
 
     const svg = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" viewBox="0 0 300 150">
+      <svg xmlns="http://www.w3.org/2000/svg" width="350" height="200" viewBox="0 0 350 200">
         <style>
           .title { 
             font-family: 'Segoe UI', Arial, sans-serif; 
-            font-size: 18px; 
+            font-size: 22px; 
             font-weight: 600; 
             fill: #FFFFFF;
             text-shadow: 0 0 8px rgba(255,255,255,0.7);
           }
           .artist { 
             font-family: 'Segoe UI', Arial, sans-serif;
-            font-size: 14px; 
+            font-size: 16px; 
             fill: #E0E0E0;
             text-shadow: 0 0 5px rgba(255,255,255,0.5);
           }
         </style>
         
-        <!-- Texto con brillo -->
-        <text x="50%" y="35%" class="title" text-anchor="middle">${title}</text>
-        <text x="50%" y="50%" class="artist" text-anchor="middle">${artist}</text>
+        <!-- Texto superior bien espaciado -->
+        <text x="50%" y="30%" class="title" text-anchor="middle">${title}</text>
+        <text x="50%" y="40%" class="artist" text-anchor="middle">${artist}</text>
         
-        <!-- Barritas moradas gigantes (90px de altura = 3x30px) -->
-        <g transform="translate(120, 70)">
-          <rect width="6" height="90" fill="#9C27B0" rx="3">
-            <animate attributeName="height" values="90;30;90" dur="1s" repeatCount="indefinite" begin="0.1s"/>
-          </rect>
-          <rect x="15" width="6" height="90" fill="#7B1FA2" rx="3">
-            <animate attributeName="height" values="90;45;90" dur="1s" repeatCount="indefinite" begin="0.3s"/>
-          </rect>
-          <rect x="30" width="6" height="90" fill="#6A1B9A" rx="3">
-            <animate attributeName="height" values="90;60;90" dur="1s" repeatCount="indefinite" begin="0.5s"/>
-          </rect>
+        <!-- 10 barritas moradas compactas -->
+        <g transform="translate(100, 90)">
+          <!-- Generamos 10 barritas con animaciones alternadas -->
+          ${Array.from({length: 10}).map((_, i) => `
+            <rect 
+              x="${i * 15}" 
+              width="4" 
+              height="45" 
+              fill="#${['9C27B0','8E24AA','7B1FA2','6A1B9A','5C1A99','4A148C','3F0D7A','311B92','1A237E','0D0D61'][i]}" 
+              rx="2"
+            >
+              <animate 
+                attributeName="height" 
+                values="45;${5 + (i * 4)};45" 
+                dur="${0.8 + (i * 0.1)}s" 
+                repeatCount="indefinite" 
+                begin="${i * 0.1}s"
+              />
+            </rect>
+          `).join('')}
         </g>
         
-        <!-- Crédito casi invisible -->
-        <text x="50%" y="97%" font-size="8" fill="#333" text-anchor="middle" font-family="Arial">YouTube Music</text>
+        <!-- Crédito casi invisible abajo -->
+        <text x="50%" y="95%" font-size="9" fill="#444" text-anchor="middle" font-family="Arial">YouTube Music</text>
       </svg>
     `;
 
@@ -72,8 +81,8 @@ module.exports = async (req, res) => {
     res.setHeader('Cache-Control', 'no-cache, max-age=0');
     res.send(svg);
   } catch (error) {
-    const errorSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150">
-      <text x="50%" y="50%" fill="#9C27B0" font-family="Arial" text-anchor="middle" font-size="12">${error.message}</text>
+    const errorSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="350" height="200">
+      <text x="50%" y="50%" fill="#9C27B0" font-family="Arial" text-anchor="middle" font-size="14">${error.message}</text>
     </svg>`;
     res.setHeader('Content-Type', 'image/svg+xml');
     res.send(errorSvg);
