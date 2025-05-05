@@ -23,7 +23,15 @@ module.exports = async (req, res) => {
     }
 
     const track = data.items[0].snippet;
+    // Debug: Log thumbnail URLs
+    console.log('Thumbnail High:', track.thumbnails?.high?.url);
+    console.log('Thumbnail Default:', track.thumbnails?.default?.url);
+
+    // Seleccionar thumbnail con fallback
     const thumbnail = track.thumbnails?.high?.url || track.thumbnails?.default?.url || 'https://via.placeholder.com/120';
+    // Sanitizar thumbnail URL (por si acaso)
+    const safeThumbnail = encodeURI(thumbnail);
+
     const title = (track.title.split(' - ')[0] || 'Título Desconocido').replace(/[<>&"']/g, '');
     const artist = (track.title.split(' - ')[1] || track.videoOwnerChannelTitle || 'Artista Desconocido').replace(/[<>&"']/g, '');
 
@@ -36,7 +44,7 @@ module.exports = async (req, res) => {
           .logo { font-size: 12px; fill: #aaa; font-weight: bold; }
         </style>
         <rect width="340" height="180" rx="10" fill="#212121"/>
-        <image href="${thumbnail}" x="20" y="20" width="120" height="120" rx="5"/>
+        <image href="${safeThumbnail}" x="20" y="20" width="120" height="120" rx="5"/>
         <text x="150" y="50" class="title">${title}</text>
         <text x="150" y="70" class="artist">${artist}</text>
         <rect x="150" y="90" width="4" height="30" fill="#FF0000" rx="2">
