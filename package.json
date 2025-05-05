@@ -1,15 +1,12 @@
 {
-  "name": "youtube-now-playing",
-  "version": "1.0.0",
-  "description": "Un widget de 'Now Playing' de YouTube Music para GitHub README",
-  "main": "api/youtube.js",
+  "name": "youtube-music-widget",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "start": "node api/youtube.js"
+    "vercel-build": "echo 'Building for Vercel'",
+    "deploy": "vercel deploy"
   },
   "dependencies": {
-    "node-fetch": "^2.6.7"
-  },
-  "engines": {
-    "node": ">=14"
+    "node-fetch": "^2.6.12"
   }
 }
