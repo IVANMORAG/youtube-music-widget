@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "vercel-build": "echo 'Building for Vercel'",
-    "deploy": "vercel deploy"
+    "deploy": "vercel deploy",
+    "dev": "vercel dev"
   },
   "dependencies": {
-    "node-fetch": "^2.6.12"
+    "node-fetch": "^2.6. prawn12"
   }
 }
