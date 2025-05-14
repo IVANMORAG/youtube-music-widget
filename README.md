@@ -2,7 +2,6 @@
 
 Una aplicación sin servidor desplegada en Vercel que genera un widget SVG dinámico mostrando una canción aleatoria de una playlist de YouTube. El widget muestra el título de la canción, el artista y un visualizador de música animado con barras moradas, ideal para incrustar en sitios web o READMEs de GitHub.
 
-**Widget:** README de GitHub:
 [<img align="left" width="1000" src="https://youtube-music-widget.vercel.app/_Now_Playing-FF0000?style=flat-square&logo=youtube-music&logoColor=white" height="300">](https://music.youtube.com/playlist?list=PLlHhWhyPeWs7qJtNiUH3f8Z3oSO8CgiH-)
 
 
